@@ -1,0 +1,32 @@
+version: '3.7'
+
+services:
+  nestjsapp:
+    image: nestjs-hot-reload
+    build:
+      context: ./
+      dockerfile: Dockerfile.dev
+    container_name: nestjs-app
+    volumes:
+      - /tmp/nestjsapp/npm-cache:/root/.npm:z
+      - ./:/usr/src/app:z
+    ports:
+      - '3000:3000'
+    environment:
+      - PORT=3000
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - '9090:9090'
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - '3030:3000'
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - /tmp/grafana/nestjsgrafana:/var/lib/grafana
